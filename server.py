@@ -22,8 +22,11 @@ def handle(client):
         while True:
             message = client.recv(1024)
             if message:
-                print(f"Message received: {message.decode('utf-8')}")
-                broadcast(message, client)
+                index = clients.index(client)
+                nickname = nicknames[index]
+                formatted_message = f"{nickname}: {message.decode('utf-8')}"
+                print(f"Message received: {formatted_message}")
+                broadcast(formatted_message.encode('utf-8'), client)
     except:
         index = clients.index(client)
         clients.remove(client)
@@ -33,6 +36,7 @@ def handle(client):
         nicknames.remove(nickname)
         client.close()
 
+
 def receive():
     """Accept incoming client connections."""
     server.listen()
@@ -41,12 +45,11 @@ def receive():
     while True:
         client, address = server.accept()
         print(f"Connection from {address} established.")
-        client.send("NICKNAME".encode('utf-8'))
         nickname = client.recv(1024).decode('utf-8')
         nicknames.append(nickname)
         clients.append(client)
         print(f"Nickname is {nickname}.")
-        broadcast(f"{nickname} has joined the chat.".encode('utf-8'), client)
+        broadcast(f"{nickname} has joined.".encode('utf-8'), client)
         client.send(f"Welcome {nickname}!".encode('utf-8'))
 
         thread = threading.Thread(target=handle, args=(client,))
@@ -57,3 +60,16 @@ server.bind((HOST, PORT))
 
 # Start receiving clients
 receive()
+
+
+
+import signal
+import sys
+
+def handle_shutdown(signal, frame):
+    print("Shutting down the server...")
+    server.close()  # Close the server socket
+    sys.exit(0)
+
+# Register the signal handler for SIGINT (Ctrl+C)
+signal.signal(signal.SIGINT, handle_shutdown)
