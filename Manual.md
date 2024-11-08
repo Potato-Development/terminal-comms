@@ -6,4 +6,4 @@
  Big note: do not change port to a value lower than 1024. Generally, if the port is lower than 1024, the program will NOT run. 
  Client: Change host IP and port to match the server.
 
-***Make sure you run the server is running before you lauch the client. Launching the client before launching the server will not work, and you will have to relaunch the client.***
+***Make sure the server is running before you lauch the client. Launching the client before launching the server will not work.***
